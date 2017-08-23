@@ -9,6 +9,12 @@ from sklearn.externals import joblib
 from scipy.ndimage.measurements import label
 from moviepy.editor import VideoFileClip
 
+class Tracker():
+    def __init__(self):
+        self.heat = None
+
+tobj = Tracker()
+
 svc = joblib.load('svc_model.pkl')
 
 with open('params.pkl', 'rb') as f: 
@@ -21,19 +27,27 @@ with open('params.pkl', 'rb') as f:
 ystarts = (350,408,444)
 ystops = (484,600,700)
 scales = ((1.0,382,510),(1.5,408,600),(2.0,444,700))
+#images = glob.glob('test_images/test*.jpg')
+#for fname in images:
+#    #read each image
+#    img = mpimg.imread(fname)
+#    out_img = process_image(img)
+#    plt.imshow(out_img)
+#    plt.show()
+image = mpimg.imread('test_images/test1.jpg')
+tobj.heat = np.zeros_like(image[:,:,0]).astype(np.float)
 
 def process_image(img):
     [hot_boxes, all_boxes] = find_cars(img, ystarts, ystops, scales, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, color_space)
 
     # Add heat to each box in box list
-    heat = np.zeros_like(img[:,:,0]).astype(np.float)
-    heat = add_heat(heat,hot_boxes)
+    tobj.heat = add_heat(tobj.heat,hot_boxes)
         
     # Apply threshold to help remove false positives
-    heat = apply_threshold(heat,1)
+    tobj.heat = apply_threshold(tobj.heat,5)
 
     # Visualize the heatmap when displaying    
-    heatmap = np.clip(heat, 0, 255)
+    heatmap = np.clip(tobj.heat, 0, 255)
 
     # Find final boxes from heatmap using label function
     labels = label(heatmap)
@@ -52,16 +66,9 @@ def process_image(img):
 
     return out_img
 
-#images = glob.glob('test_images/test*.jpg')
-#for fname in images:
-#    #read each image
-#    img = mpimg.imread(fname)
-#    out_img = process_image(img)
-#    plt.imshow(out_img)
-#    plt.show()
 
 #Apply video
 white_output = 'output_videos/project_video_tracking.mp4'
-clip1 = VideoFileClip("project_video.mp4")
+clip1 = VideoFileClip("project_video.mp4").subclip(0,5)
 white_clip = clip1.fl_image(process_image) 
 white_clip.write_videofile(white_output, audio=False)
