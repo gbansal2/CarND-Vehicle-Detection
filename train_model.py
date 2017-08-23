@@ -41,13 +41,13 @@ print("Shape of Not Car images = ", mpimg.imread(notcars[0]).shape)
 #notcars = notcars[0:sample_size]
 
 ### TODO: Tweak these parameters and see how the results change.
-color_space = 'HSV' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
-orient = 9  # HOG orientations
+color_space = 'HLS' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient = 11  # HOG orientations
 pix_per_cell = 8 # HOG pixels per cell
-cell_per_block = 2 # HOG cells per block
+cell_per_block = 4 # HOG cells per block
 hog_channel = "ALL" # Can be 0, 1, 2, or "ALL"
 spatial_size = (32, 32) # Spatial binning dimensions
-hist_bins = 32    # Number of histogram bins
+hist_bins = 64    # Number of histogram bins
 spatial_feat = True # Spatial features on or off
 hist_feat = True # Histogram features on or off
 hog_feat = True # HOG features on or off
@@ -76,7 +76,7 @@ scaled_X = X_scaler.transform(X)
 print('X shape = ', X.shape)
 
 with open('params.pkl', 'wb') as f: 
-    pickle.dump([orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, X_scaler], f)
+    pickle.dump([orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, X_scaler, color_space], f)
 
 # Define the labels vector
 y = np.hstack((np.ones(len(car_features)), np.zeros(len(notcar_features))))
