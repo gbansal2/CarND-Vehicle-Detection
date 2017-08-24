@@ -12,6 +12,7 @@ from moviepy.editor import VideoFileClip
 class Tracker():
     def __init__(self):
         self.heat = None
+        self.framecount = 0
 
 tobj = Tracker()
 
@@ -35,16 +36,22 @@ scales = ((1.0,382,510),(1.5,408,600),(2.0,444,700))
 #    plt.imshow(out_img)
 #    plt.show()
 image = mpimg.imread('test_images/test1.jpg')
-tobj.heat = np.zeros_like(image[:,:,0]).astype(np.float)
 
 def process_image(img):
     [hot_boxes, all_boxes] = find_cars(img, ystarts, ystops, scales, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, color_space)
 
+# Reset heat every 5 frames
+    if tobj.framecount % 5 == 0:
+        tobj.heat = np.zeros_like(image[:,:,0]).astype(np.float)
+
+
     # Add heat to each box in box list
     tobj.heat = add_heat(tobj.heat,hot_boxes)
+
+    thresh = tobj.framecount % 5 + 1
         
     # Apply threshold to help remove false positives
-    tobj.heat = apply_threshold(tobj.heat,5)
+    tobj.heat = apply_threshold(tobj.heat, thresh)
 
     # Visualize the heatmap when displaying    
     heatmap = np.clip(tobj.heat, 0, 255)
