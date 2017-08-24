@@ -41,14 +41,14 @@ def process_image(img):
     [hot_boxes, all_boxes] = find_cars(img, ystarts, ystops, scales, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, color_space)
 
 # Reset heat every 5 frames
-    if tobj.framecount % 5 == 0:
+    if tobj.framecount % 10 == 0:
         tobj.heat = np.zeros_like(image[:,:,0]).astype(np.float)
 
 
     # Add heat to each box in box list
     tobj.heat = add_heat(tobj.heat,hot_boxes)
 
-    thresh = tobj.framecount % 5 + 1
+    thresh = tobj.framecount % 10 + 2
         
     # Apply threshold to help remove false positives
     tobj.heat = apply_threshold(tobj.heat, thresh)
