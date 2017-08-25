@@ -36,25 +36,32 @@ scales = ((1.0,382,510),(1.5,408,600),(2.0,444,700))
 #    plt.imshow(out_img)
 #    plt.show()
 image = mpimg.imread('test_images/test1.jpg')
+tobj.heat = np.zeros((image.shape[0],image.shape[1],3),dtype=np.float)
+#print(tobj.heat.shape)
 
 def process_image(img):
     [hot_boxes, all_boxes] = find_cars(img, ystarts, ystops, scales, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, color_space)
 
-# Reset heat every 5 frames
-    if tobj.framecount % 10 == 0:
-        tobj.heat = np.zeros_like(image[:,:,0]).astype(np.float)
-
-
     # Add heat to each box in box list
-    tobj.heat = add_heat(tobj.heat,hot_boxes)
+    # Maintain heat for previous two frames and update the current
+    tobj.heat[:,:,0] = tobj.heat[:,:,1]
+    tobj.heat[:,:,1] = tobj.heat[:,:,2]
+    tobj.heat[:,:,2] = add_heat(tobj.heat[:,:,2],hot_boxes)
 
-    thresh = tobj.framecount % 10 + 2
+    # dstack the last two and current heats
+    current_heat = np.dstack((tobj.heat[:,:,0],tobj.heat[:,:,1],
+                             tobj.heat[:,:,2]))
+
+    #thresh = tobj.framecount % 10 + 2
+    thresh = 3
         
     # Apply threshold to help remove false positives
-    tobj.heat = apply_threshold(tobj.heat, thresh)
+    #tobj.heat = apply_threshold(tobj.heat, thresh)
+    current_heat = apply_threshold(current_heat, thresh)
 
     # Visualize the heatmap when displaying    
-    heatmap = np.clip(tobj.heat, 0, 255)
+    #heatmap = np.clip(tobj.heat, 0, 255)
+    heatmap = np.clip(current_heat, 0, 255)
 
     # Find final boxes from heatmap using label function
     labels = label(heatmap)
@@ -74,9 +81,9 @@ def process_image(img):
     return out_img
 
 
-#Apply video
+##Apply video
 white_output = 'output_videos/project_video_tracking.mp4'
-#clip1 = VideoFileClip("project_video.mp4").subclip(5,15)
-clip1 = VideoFileClip("project_video.mp4")
+clip1 = VideoFileClip("project_video.mp4").subclip(5,15)
+#clip1 = VideoFileClip("project_video.mp4")
 white_clip = clip1.fl_image(process_image) 
 white_clip.write_videofile(white_output, audio=False)
