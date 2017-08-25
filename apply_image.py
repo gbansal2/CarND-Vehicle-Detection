@@ -30,7 +30,7 @@ ystops = (484,600,700)
 scales = ((1.0,382,510),(1.5,408,600),(2.0,444,700))
 
 image = mpimg.imread('test_images/test1.jpg')
-tobj.heat = np.zeros((image.shape[0],image.shape[1],10),dtype=np.float)
+tobj.heat = np.zeros((image.shape[0],image.shape[1],5),dtype=np.float)
 
 
 def process_image(img):
@@ -38,25 +38,20 @@ def process_image(img):
 
     # Add heat to each box in box list
     # Maintain heat for previous 9 frames and update the current
-    for i in range(0,8):
+    for i in range(0,3):
         tobj.heat[:,:,i] = tobj.heat[:,:,i+1]
     #tobj.heat[:,:,0] = tobj.heat[:,:,1]
     #tobj.heat[:,:,1] = tobj.heat[:,:,2]
     #tobj.heat[:,:,2] = np.zeros_like(tobj.heat[:,:,2],dtype=np.float)
     #tobj.heat[:,:,2] = add_heat(tobj.heat[:,:,2],hot_boxes)
-    tobj.heat[:,:,9] = np.zeros_like(tobj.heat[:,:,9],dtype=np.float)
-    tobj.heat[:,:,9] = add_heat(tobj.heat[:,:,9],hot_boxes)
+    tobj.heat[:,:,4] = np.zeros_like(tobj.heat[:,:,4],dtype=np.float)
+    tobj.heat[:,:,4] = add_heat(tobj.heat[:,:,4],hot_boxes)
 
     # dstack the last two and current heats
     current_heat = np.average(np.dstack((tobj.heat[:,:,0],tobj.heat[:,:,1],
                              tobj.heat[:,:,2],
                              tobj.heat[:,:,3],
-                             tobj.heat[:,:,4],
-                             tobj.heat[:,:,5],
-                             tobj.heat[:,:,6],
-                             tobj.heat[:,:,7],
-                             tobj.heat[:,:,8],
-                             tobj.heat[:,:,9])),axis=2)
+                             tobj.heat[:,:,4])),axis=2)
 
     #print(current_heat.shape)
 
