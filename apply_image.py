@@ -38,10 +38,12 @@ def process_image(img):
 
     # Add heat to each box in box list
     # Maintain heat for previous 9 frames and update the current
-    for i in range(0,3):
-        tobj.heat[:,:,i] = tobj.heat[:,:,i+1]
-    #tobj.heat[:,:,0] = tobj.heat[:,:,1]
-    #tobj.heat[:,:,1] = tobj.heat[:,:,2]
+    #for i in range(0,3):
+    #    tobj.heat[:,:,i] = tobj.heat[:,:,i+1]
+    tobj.heat[:,:,0] = tobj.heat[:,:,1]
+    tobj.heat[:,:,1] = tobj.heat[:,:,2]
+    tobj.heat[:,:,2] = tobj.heat[:,:,3]
+    tobj.heat[:,:,3] = tobj.heat[:,:,4]
     #tobj.heat[:,:,2] = np.zeros_like(tobj.heat[:,:,2],dtype=np.float)
     #tobj.heat[:,:,2] = add_heat(tobj.heat[:,:,2],hot_boxes)
     tobj.heat[:,:,4] = np.zeros_like(tobj.heat[:,:,4],dtype=np.float)
@@ -98,6 +100,6 @@ def process_image(img):
 ##Apply video
 white_output = 'output_videos/project_video_tracking.mp4'
 clip1 = VideoFileClip("project_video.mp4").subclip(5,15)
-#clip1 = VideoFileClip("project_video.mp4")
+##clip1 = VideoFileClip("project_video.mp4")
 white_clip = clip1.fl_image(process_image) 
 white_clip.write_videofile(white_output, audio=False)
