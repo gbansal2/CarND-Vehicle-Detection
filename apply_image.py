@@ -28,16 +28,10 @@ with open('params.pkl', 'rb') as f:
 ystarts = (350,408,444)
 ystops = (484,600,700)
 scales = ((1.0,382,510),(1.5,408,600),(2.0,444,700))
-#images = glob.glob('test_images/test*.jpg')
-#for fname in images:
-#    #read each image
-#    img = mpimg.imread(fname)
-#    out_img = process_image(img)
-#    plt.imshow(out_img)
-#    plt.show()
+
 image = mpimg.imread('test_images/test1.jpg')
 tobj.heat = np.zeros((image.shape[0],image.shape[1],3),dtype=np.float)
-#print(tobj.heat.shape)
+
 
 def process_image(img):
     [hot_boxes, all_boxes] = find_cars(img, ystarts, ystops, scales, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, color_space)
@@ -46,14 +40,17 @@ def process_image(img):
     # Maintain heat for previous two frames and update the current
     tobj.heat[:,:,0] = tobj.heat[:,:,1]
     tobj.heat[:,:,1] = tobj.heat[:,:,2]
+    tobj.heat[:,:,2] = np.zeros_like(tobj.heat[:,:,2],dtype=np.float)
     tobj.heat[:,:,2] = add_heat(tobj.heat[:,:,2],hot_boxes)
 
     # dstack the last two and current heats
-    current_heat = np.dstack((tobj.heat[:,:,0],tobj.heat[:,:,1],
-                             tobj.heat[:,:,2]))
+    current_heat = np.average(np.dstack((tobj.heat[:,:,0],tobj.heat[:,:,1],
+                             tobj.heat[:,:,2])),axis=2)
+
+    #print(current_heat.shape)
 
     #thresh = tobj.framecount % 10 + 2
-    thresh = 3
+    thresh = 1
         
     # Apply threshold to help remove false positives
     #tobj.heat = apply_threshold(tobj.heat, thresh)
@@ -79,6 +76,17 @@ def process_image(img):
     #plt.show()
 
     return out_img
+
+#Apply images
+#images = glob.glob('test_images/test*.jpg')
+#
+#for fname in images:
+#    #read each image
+#    img = mpimg.imread(fname)
+#    out_img = process_image(img)
+#    #plt.imshow(out_img)
+#    #plt.show()
+##print(tobj.heat.shape)
 
 
 ##Apply video
