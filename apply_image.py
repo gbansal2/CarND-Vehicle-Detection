@@ -50,7 +50,7 @@ def process_image(img):
     #print(current_heat.shape)
 
     #thresh = tobj.framecount % 10 + 2
-    thresh = 1
+    thresh = 2
         
     # Apply threshold to help remove false positives
     #tobj.heat = apply_threshold(tobj.heat, thresh)
