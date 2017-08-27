@@ -96,3 +96,10 @@ Here's an example result showing the heatmap from an example image:
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
+1. I first struggled with getting the accuracy of training the classifier to a high value. I got success with increasing the size of the feature vector by varying the parameter to the hog function and also using all the available images to increase the dataset size.
+
+2. The next difficulty was selecting the appropriate window scales. I experimented a bit with window sizes and where the image to apply different sized windows. I tuned by trial and error the ystart and ystop to control the image region to apply sliding window search. 
+
+3. Finally, the issue was with a lot of false positives. I played with the threshold but this did not solve the problem. I too high value reduced the actual detections, and small value resulted in large number of false positives. I then used a Class to track the heatmap over 5 successive frames, used `dstack` to stack heatmaps over 5 frames, and then averaged the heatmap value, and finally apply the thresholding. Through this method, I was able to get rid of a lot of false positives.
+
+I think there is still room to improve for all the above three points. One can further increase the classifier accuracy by adding more images to dataset or tuning the feature vector. We can also furthur tune the sliding window search. Finally, it's possible to also experiment more with thresholding and aggregrating of heatmaps to reduce the false positives even more.
