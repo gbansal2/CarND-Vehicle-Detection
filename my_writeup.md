@@ -5,9 +5,10 @@
 [image2]: ./non-vehicles/GTI/image59.png
 [image3]: ./car_hog_Schannel.png
 [image4]: ./notcar_hog_Schannel.png
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
+[image5]: ./output_images/allboxes_test4.jpg
+[image6]: ./output_images/detections_test4.jpg
+[image7]: ./output_images/detections_test6.jpg
+[image8]: ./output_images/detections_test3.jpg
 [video1]: ./project_video.mp4
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
@@ -39,25 +40,34 @@ Here is an example for a car and a not-car image, using the `HLS` color space an
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters for HOG features, such as orientations, pixels per cell, cells per block, color spaces, etc. I changed these parameters to increase the feature vector size and monitored the trainng error. I settled on the set of parameters for which I obtained >98% training accuracy.
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+I trained a linear SVM using the training data set. The code for training a classifier is in file `train_model.py` from lines #85 to #101. The training dataset consists of hog features, color features, and spatial features. The dataset is randomly split into a training set and a validation set (20%). I obtained a validation set accuracy of greater than 98%. 
+
+The model was saved as a pickle file which can be read later during the inference stage. 
 
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+I implemented a sliding window search in the function `find_cars` in `helper_functions.py` file. I generated windows of three sizes, with sizes 64 x 64, 96 x 96, and 128 x 128. The application range for each window size is different. The smallest window is applied towards the middle of the image, and the largest window is applied towards the bottom. This is because the vehicles are bigger in size, the closer they are to the camera.
+The hog features are extracted once for the entire image, and are filtered as the window is slided across the image.
 
-![alt text][image3]
+The figure below shows all the windows for an example image.
+
+![alt text][image5]
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on three scales using HLS 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
-![alt text][image4]
+![alt_text][image7]
+![alt_text][image8]
+
+Note that in the bottom image, there is a false detection. This is handled using a heatmap method as described in the Video Implementation section below.
+
 ---
 
 ### Video Implementation
